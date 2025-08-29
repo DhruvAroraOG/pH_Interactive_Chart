@@ -1,0 +1,254 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Interactive pH Chart</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#111b2b;
+      --accent:#3b82f6;
+      --text:#e6eef8;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: 'Segoe UI', Roboto, Inter, Arial, sans-serif;
+      margin:0;
+      background:linear-gradient(135deg,#071126,#0a1d33);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      padding:20px;
+    }
+    .container{
+      width:100%;
+      max-width:1000px;
+      background:rgba(255,255,255,0.05);
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
+    }
+    h1{margin:0 0 10px;font-size:26px;text-align:center}
+    p.lead{margin:0 0 20px;text-align:center;color:#bcd3ee;font-size:15px}
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+    @media(max-width:768px){
+      .grid{grid-template-columns:1fr;}
+    }
+
+    .panel{
+      background:var(--card);
+      padding:16px;
+      border-radius:14px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    }
+
+    .color-box{
+      height:200px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:22px;
+      color:#031028;
+      margin-bottom:14px;
+      transition: background .3s ease;
+    }
+
+    .slider-wrap{margin:12px 0}
+    input[type=range]{width:100%}
+
+    .values{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+    .chip{
+      background:rgba(255,255,255,0.08);
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:14px;
+    }
+
+    .bar{height:16px; background:linear-gradient(90deg,#ff3b30,#ff9500,#ffcc00,#4cd964,#0a84ff,#5e5ce6); border-radius:10px; position:relative;}
+    .marker .dot{position:absolute; top:-5px; width:18px; height:18px; border-radius:50%; background:#fff; transform:translateX(-50%); box-shadow:0 2px 6px rgba(0,0,0,0.6); border:2px solid #3b82f6; transition:left .25s ease}
+
+    .list{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+    .example{flex:1; min-width:120px; background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:10px; text-align:center; font-size:14px; transition:.2s}
+    .example strong{display:block; font-size:15px}
+    .example:hover{background:rgba(255,255,255,0.12)}
+
+    table{width:100%; border-collapse:collapse; margin-top:10px; font-size:14px}
+    td,th{padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.05)}
+
+    .footer{margin-top:10px; font-size:13px; color:#9fbce6; text-align:center}
+
+    button{
+      padding:8px 12px;
+      border-radius:8px;
+      border:none;
+      background:linear-gradient(180deg,#0ea5e9,#0369a1);
+      color:white;
+      cursor:pointer;
+      font-size:14px;
+      transition:background .2s;
+    }
+    button:hover{background:linear-gradient(180deg,#36c0f7,#037bbf)}
+  </style>
+<style type="text/css" id="mytempCss">._8mqQwQ { display: none; } ._1TWLMK.icF5zO { opacity: 0.01; }</style></head>
+<body class="vsc-initialized">
+  <div class="container">
+    <h1>Interactive pH Chart</h1>
+    <p class="lead">Move the slider to change pH (0 → 14). See the indicator color, ion concentrations, and examples.</p>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="color-box" id="colorBox" style="background: rgb(255, 45, 26);">pH 0.5</div>
+        <div class="slider-wrap">
+          <input id="pHslider" type="range" min="0" max="14" step="0.1" value="7" wfd-id="id0">
+        </div>
+
+        <div class="values">
+          <div class="chip">pH: <span id="pHvalue">0.5</span></div>
+          <div class="chip">[H⁺] = <span id="Hval">0.316228 M</span> M</div>
+          <div class="chip">[OH⁻] = <span id="OHval">3.162e-14 M</span> M</div>
+          <div class="chip">Indicator: <span id="indName">Universal / Natural indicator</span></div>
+        </div>
+        <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
+          <button id="toggleLog">Toggle scientific notation</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div><strong>pH Spectrum</strong>
+          <div class="bar" id="spectrum" style="margin-top:10px">
+            <div id="marker" class="marker"><div class="dot" style="left: 3.57143%;"></div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px"><strong>Real-world examples</strong>
+          <div class="list" id="examples"><div class="example"><strong>Battery acid</strong><div style="opacity:.9">pH ≈ 1</div></div><div class="example"><strong>Stomach acid</strong><div style="opacity:.9">pH ≈ 1.5</div></div><div class="example"><strong>Lemon juice</strong><div style="opacity:.9">pH ≈ 2</div></div><div class="example"><strong>Orange juice</strong><div style="opacity:.9">pH ≈ 3.5</div></div></div>
+        </div>
+
+        <div style="margin-top:16px"><strong>Calculated values</strong>
+          <table>
+            <tbody><tr><th>Quantity</th><th>Value</th></tr>
+            <tr><td>pH</td><td id="tblpH">0.5</td></tr>
+            <tr><td>[H⁺]</td><td id="tblH">3.162e-1</td></tr>
+            <tr><td>[OH⁻]</td><td id="tblOH">3.162e-14</td></tr>
+            <tr><td>Relationship</td><td>pH = -log10([H⁺]); [H⁺][OH⁻] = 1×10⁻¹⁴</td></tr>
+          </tbody></table>
+        </div>
+        <div class="footer">Made By Dhruv Arora XI-A4 — interactive acid–base model</div>
+      </div>
+    </div>
+  </div>
+  </body>
+    <script>
+    const examples = [
+      {name:'Battery acid', ph:1},
+      {name:'Stomach acid', ph:1.5},
+      {name:'Lemon juice', ph:2},
+      {name:'Orange juice', ph:3.5},
+      {name:'Tomato', ph:4.2},
+      {name:'Milk', ph:6.6},
+      {name:'Pure water', ph:7},
+      {name:'Blood', ph:7.4},
+      {name:'Sea water', ph:8.1},
+      {name:'Baking soda solution', ph:9},
+      {name:'Soap', ph:10},
+      {name:'Ammonia solution', ph:11.6},
+      {name:'Bleach', ph:13}
+    ];
+
+    const slider=document.getElementById('pHslider');
+    const colorBox=document.getElementById('colorBox');
+    const pHvalue=document.getElementById('pHvalue');
+    const Hval=document.getElementById('Hval');
+    const OHval=document.getElementById('OHval');
+    const indName=document.getElementById('indName');
+    const marker=document.querySelector('#marker .dot');
+    const examplesNode=document.getElementById('examples');
+    const tblpH=document.getElementById('tblpH');
+    const tblH=document.getElementById('tblH');
+    const tblOH=document.getElementById('tblOH');
+    const toggleLog=document.getElementById('toggleLog');
+
+    let useSci=true;
+    function formatValue(v){
+      if(useSci) return Number(v).toExponential(3).replace('e+','e');
+      if(v<0.001) return Number(v).toExponential(3);
+      return Number(v).toFixed(6);
+    }
+
+    function update(pH){
+      const ph=Number(pH);
+      pHvalue.textContent=ph.toFixed(1);
+      tblpH.textContent=ph.toFixed(1);
+      const H=Math.pow(10,-ph);
+      const Kw=1e-14;
+      const OH=Kw/H;
+      Hval.textContent=formatValue(H)+' M';
+      OHval.textContent=formatValue(OH)+' M';
+      tblH.textContent=(Number(H)).toExponential(3).replace('e+','e');
+      tblOH.textContent=(Number(OH)).toExponential(3).replace('e+','e');
+      const color=phToRgb(ph);
+      colorBox.style.background=color;
+      colorBox.textContent='pH '+ph.toFixed(1);
+      const percent=(ph/14)*100;
+      marker.style.left=percent+'%';
+      renderExamples(ph);
+      indName.textContent='Universal / Natural indicator';
+    }
+
+    function renderExamples(ph){
+      examplesNode.innerHTML='';
+      const sorted=examples.slice().sort((a,b)=>Math.abs(a.ph-ph)-Math.abs(b.ph-ph));
+      for(let i=0;i<4;i++){
+        const ex=sorted[i];
+        const el=document.createElement('div');
+        el.className='example';
+        el.innerHTML=`<strong>${ex.name}</strong><div style="opacity:.9">pH ≈ ${ex.ph}</div>`;
+        examplesNode.appendChild(el);
+      }
+    }
+
+    function phToRgb(ph){
+      const stops=[[0,0],[2,20],[4.5,45],[6.5,120],[8.5,200],[11,250],[14,280]];
+      let left=stops[0];
+      for(let i=1;i<stops.length;i++){
+        const right=stops[i];
+        if(ph<=right[0]){
+          const t=(ph-left[0])/(right[0]-left[0]);
+          const hue=left[1]+t*(right[1]-left[1]);
+          return `hsl(${hue}deg 100% 55%)`;
+        }
+        left=right;
+      }
+      return 'hsl(280deg 100% 55%)';
+    }
+
+    slider.addEventListener('input',e=>update(e.target.value));
+    toggleLog.addEventListener('click',()=>{useSci=!useSci;update(slider.value);toggleLog.textContent=useSci?'Toggle decimal':'Toggle scientific notation'});
+    const spectrum=document.getElementById('spectrum');
+    spectrum.addEventListener('click',(ev)=>{
+      const r=spectrum.getBoundingClientRect();
+      const x=ev.clientX-r.left;
+      const ratio=x/r.width;
+      const newpH=Math.max(0,Math.min(14,ratio*14));
+      slider.value=newpH;
+      update(newpH);
+    });
+
+    update(slider.value);
+  </script>
+
+  </html>
