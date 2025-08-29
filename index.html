@@ -102,7 +102,18 @@
       transition:background .2s;
     }
     button:hover{background:linear-gradient(180deg,#36c0f7,#037bbf)}
-  </style>
+  
+/* On small screens, disable vertical centering */
+@media(max-width: 768px){
+  body {
+    align-items: flex-start; /* push content from top */
+  }
+  .container {
+    margin-top: 20px;
+  }
+}
+
+</style>
 <style type="text/css" id="mytempCss">._8mqQwQ { display: none; } ._1TWLMK.icF5zO { opacity: 0.01; }</style></head>
 <body class="vsc-initialized">
   <div class="container">
